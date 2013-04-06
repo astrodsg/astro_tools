@@ -1,4 +1,4 @@
-#!/Library/Frameworks/Python.framework/Versions/Current/bin/python
+#!/uufs/astro.utah.edu/common/astro_data/products/epd-Python/epd-7.3-2-rh5-x86_64/bin/python
 import pdb
 
 def load_Batom(return_dict='False'):
@@ -120,7 +120,7 @@ def load_Batom(return_dict='False'):
     
     return batomd
 
-def convert_atlas_for_moog (atlas_out_file,new_moog_file=None,clobber=False,include_depth_vt=False,logepsH=12,ions=[0,1]):
+def convert_atlas12_for_moog (atlas_out_file,new_moog_file=None,clobber=False,include_depth_vt=False,logepsH=12,ions=[0,1],elements=[]):
     """
     This takes the model output from ATLAS12 and converts it to MOOG's KURUCZ format for stellar atmospheres
     
@@ -136,6 +136,8 @@ def convert_atlas_for_moog (atlas_out_file,new_moog_file=None,clobber=False,incl
     logepsH             (float) Fixes the abundance of H used. Only relavent for He
     ions                (int array) This array gives the ions to be used when 
                            creating an output. e.g. [0,1,2] ===>  26.0, 26.1 and 26.2
+    elements            (int array) If empty it will use elements which depart from
+                         the input metallicity other wise adopts this list to include
     ================   =============================================================
     
     NOTE: When it creates the abundance table at the bottom of the MOOG file it only 
@@ -280,18 +282,26 @@ def convert_atlas_for_moog (atlas_out_file,new_moog_file=None,clobber=False,incl
         
         return Z, abunds
              
-    def convert_abunds_for_moog(abunds,ions):
+    def convert_abunds_for_moog(abunds,ions,elements):
         # use only the non scaled lines
-        which = np.argwhere(abunds.T[-1]==0).T[0]
+        if len(elements) == 0:
+            which = np.argwhere(abunds.T[-1]==1).T[0]
+        else:
+            which = xrange(len(abunds))
         ab_lines = []
         ab_line = ''
 
         el_i = 0
+
+        
         for i in which:
             z = abunds[i][0]
-            if z == 2: continue
-            logeps = abunds[i][3]
+
+            if len(elements) ==0: 
+                if z in [1,2]: continue
+            elif z not in elements: continue
             
+            logeps = abunds[i][3]
             for ion_state in ions:
                 z += ion_state/10.0
                 
@@ -358,7 +368,7 @@ def convert_atlas_for_moog (atlas_out_file,new_moog_file=None,clobber=False,incl
         # should be two more lines I don't really care about:
         #   PRADK 8.3210E-01
         #   BEGIN                    ITERATION  17 COMPLETED
-    ab_lines, Natoms = convert_abunds_for_moog(abunds,ions)
+    ab_lines, Natoms = convert_abunds_for_moog(abunds,ions,elements)
     if new_moog_file is None:
         return abunds,abund_table,header,layers_data,
     #=========================================================================#
@@ -409,12 +419,11 @@ def convert_atlas_for_moog (atlas_out_file,new_moog_file=None,clobber=False,incl
     lines.append('NMOL '+format(Nmols,'>10'))
     
     fout = open(new_moog_file,'w')
-    fout.write("\n".join(lines))
+    fout.write("\n".join(lines)+"\n")
     fout.close()
     return abunds
  
 if __name__ == '__main__':
     import sys
-    abunds = convert_atlas_for_moog(sys.argv[1],
-                                    sys.argv[2])
+    #abunds = convert_atlas_for_moog(sys.argv[1],sys.argv[2])
                                     

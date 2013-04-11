@@ -1,0 +1,133 @@
+def loadBatom(return_dict='False'):
+    """
+    This has the data from the file Batom.f writen by Chris Sneden in MOOG
+    "'solar' abundance set of Anders and Grevesse (1989, Geochim. Cosmichim. Acta, 53, 197" 
+                      - from Write MOGG (http://www.as.utexas.edu/~chris/codes/WRITEMOOG.ps)
+
+    the returned columns are:
+       [Z, element_name_short, element_name_long, solar_abundance_logeps]
+    
+
+    return_dict : if 'False' then it will return a list of all the abundances
+                  if 'np array' then it will return [Z,solar_abundance_logeps] as numpy array
+                  if 'by Z' then it will return a dictionary with keys which are proton number
+                  if 'by el' then it will return a dictionary with keys which are the short element name
+        
+    """
+    batom=[[1,"H","Hydrogen",12.00],
+            [2,"He","Helium",10.99],
+            [3,"Li","Lithium",3.31],
+            [4,"Be","Beryllium",1.42],
+            [5,"B","Boron",2.88],
+            [6,"C","Carbon",8.56],
+            [7,"N","Nitorgen",8.05],
+            [8,"O","Oxygen",8.93],
+            [9,"F","Florine",4.56],
+            [10,"Ne","Neon",8.09],
+            [11,"Na","Sodium",6.33],
+            [12,"Mg","Magnesium",7.58],
+            [13,"Al","Aluminium",6.47],
+            [14,"Si","Silicon",7.55],
+            [15,"P","Phosphorus",5.45],
+            [16,"S","Slufer",7.21],
+            [17,"Cl","Chlorine",5.50],
+            [18,"Ar","Argon",6.56],
+            [19,"K","Potassium",5.12],
+            [20,"Ca","Calcium",6.36],
+            [21,"Sc","Scandium",3.10],
+            [22,"Ti","titanium",4.99],
+            [23,"V","Vanadium",4.00],
+            [24,"Cr","Chromium",5.67],
+            [25,"Mn","Maganese",5.39],
+            [26,"Fe","Iron",7.52],
+            [27,"Co","Cobalt",4.92],
+            [28,"Ni","Nickel",6.25],
+            [29,"Cu","copper",4.21],
+            [30,"Zn","Zinc",4.60],
+            [31,"Ga","Gallium",2.88],
+            [32,"Ge","Germanium",3.41],
+            [33,"As","Arsnic",2.37],
+            [34,"Se","Selenium",3.35],
+            [35,"Br","Bormine",2.63],
+            [36,"Kr","Krypton",2.23],
+            [37,"Rb","Rubidium",2.60],
+            [38,"Sr","Strontium",2.90],
+            [39,"Y","Yttrium",2.24],
+            [40,"Zr","Zirconium",2.60],
+            [41,"Nb","Niobium",1.42],
+            [42,"Mo","Molybdenum",1.92],
+            [43,"Tc","Technetium",0.00],
+            [44,"Ru","Ruthenium",1.84],
+            [45,"Rh","Rhodium",1.12],
+            [46,"Pb","Palladium",1.69],
+            [47,"Ag","Silver",1.24],
+            [48,"Cd","Cadmium",1.86],
+            [49,"In","Indium",0.82],
+            [50,"Sn","Tin",2.00],
+            [51,"Sb","Antimony",1.04],
+            [52,"Te","Tellurium",2.24],
+            [53,"In","Iodine",1.51],
+            [54,"Xe","Xenon",2.23],
+            [55,"Cs","Caesium",1.12],
+            [56,"Ba","Barium",2.13],
+            [57,"La","Lanthanum",1.22],
+            [58,"Ce","Cerium",1.55],
+            [59,"Pr","Praseodymium",0.71],
+            [60,"Nd","Neodymium",1.50],
+            [61,"Pm","Promethium",0.00],
+            [62,"Sm","Samarium",1.00],
+            [63,"Eu","Europium",0.51],
+            [64,"Gd","Gadolinium",1.12],
+            [65,"Tb","Terbium",0.33],
+            [66,"Dy","Dyspeosium",1.10],
+            [67,"Ho","Holmium",0.50],
+            [68,"Er","Erbium",0.93],
+            [69,"Tm","Thulium",0.13],
+            [70,"Yb","Ytterbium",1.08],
+            [71,"Lu","Luletium",0.12],
+            [72,"Hf","Hafnium",0.88],
+            [73,"Ta","Tantalum",0.13],
+            [74,"W","Tungsten",0.68],
+            [75,"Re","Rhenium",0.27],
+            [76,"Os","Osmium",1.45],
+            [77,"Ir","iridium",1.35],
+            [78,"Pt","Plantinum",1.80],
+            [79,"Au","Gold",0.83],
+            [80,"Hg","Mercury",1.09],
+            [81,"Tl","Thallium",0.82],
+            [82,"Pb","Lead",1.85],
+            [83,"Bi","Bismuth",0.71],
+            [84,"Po","Polomium",0.00],
+            [85,"At","Astatine",0.00],
+            [86,"Rn","Radon",0.00],
+            [87,"Fr","Francium",0.00],
+            [88,"Ra","Radium",0.00],
+            [89,"Ac","Actinium",0.00],
+            [90,"Th","Thorium",0.12],
+            [91,"Pa","Protactinium",0.00],
+            [92,"U","Uranium",0.00],
+            [93,"Np","Neptunium",0.00],
+            [94,"Pu","Plutonium",0.00],
+            [95,"Am","Americium",0.00]]
+
+
+    # return as a dictionary
+    if return_dict in ['by Z','by el']: 
+        # determine which dictionary was desired
+        if return_dict == 'by el': which = 1
+        else: which = 0
+        
+        batomd={}
+        for i in range(len(batom)): batomd[batom[i][which]] = batom[i]
+        return batomd
+
+    # create a numpy array and return
+    elif return_dict == 'np array':
+        import numpy as np
+        batom_np = np.array([[arr[0],arr[3]] for arr in batom])
+        return batom_np
+
+    # return list given above
+    else: return batom
+    
+    
